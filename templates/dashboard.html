@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}NoteSmart - Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>Categories</h2>
+            <button id="add-category-btn" class="btn btn-small">+</button>
+        </div>
+        
+        <div class="category-list">
+            <a href="{{ url_for('dashboard') }}" class="category-item {% if not current_category %}active{% endif %}">
+                All Notes
+            </a>
+            {% for category in categories %}
+            <a href="{{ url_for('dashboard', category=category.id) }}" class="category-item {% if current_category == category.id %}active{% endif %}">
+                {{ category.name }}
+                <form action="{{ url_for('delete_category', category_id=category.id) }}" method="POST" class="delete-form">
+                    <button type="submit" class="btn-icon delete-category" title="Delete category">×</button>
+                </form>
+            </a>
+            {% endfor %}
+        </div>
+        
+        <form id="category-form" action="{{ url_for('new_category') }}" method="POST" class="hidden">
+            <input type="text" name="name" placeholder="New category" required>
+            <button type="submit" class="btn btn-small">Add</button>
+        </form>
+    </div>
+    
+    <div class="main-content">
+        <div class="content-header">
+            <form action="{{ url_for('dashboard') }}" method="GET" class="search-form">
+                <input type="text" name="search" placeholder="Search notes..." value="{{ search_query }}">
+                {% if current_category %}
+                <input type="hidden" name="category" value="{{ current_category }}">
+                {% endif %}
+                <button type="submit" class="btn">Search</button>
+            </form>
+            <a href="{{ url_for('new_note') }}" class="btn btn-primary">New Note</a>
+        </div>
+        
+        <div class="notes-grid">
+            {% if notes %}
+                {% for note in notes %}
+                <div class="note-card {{ note.color }}">
+                    <div class="note-header">
+                        {% if note.category_name %}
+                        <span class="note-category">{{ note.category_name }}</span>
+                        {% endif %}
+                        {% if note.is_todo %}
+                        <span class="note-type">To-Do</span>
+                        {% endif %}
+                    </div>
+                    <a href="{{ url_for('view_note', note_id=note.id) }}" class="note-body">
+                        <h3>{{ note.title }}</h3>
+                        <p>{{ note.content|truncate(100) }}</p>
+                    </a>
+                    <div class="note-footer">
+                        <span class="note-date">{{ note.updated_date|datetime }}</span>
+                        <div class="note-actions">
+                            <a href="{{ url_for('edit_note', note_id=note.id) }}" class="btn-icon edit" title="Edit note">✏️</a>
+                            <form action="{{ url_for('delete_note', note_id=note.id) }}" method="POST" class="delete-form">
+                                <input type="hidden" name="redirect_to" value="dashboard">
+                                <button type="submit" class="btn-icon delete" title="Delete note">🗑️</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">📝</div>
+                    <h3>No notes found</h3>
+                    <p>Get started by creating your first note!</p>
+                    <a href="{{ url_for('new_note') }}" class="btn btn-primary">Create Note</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Toggle category form
+    document.getElementById('add-category-btn').addEventListener('click', function() {
+        const form = document.getElementById('category-form');
+        form.classList.toggle('hidden');
+        if (!form.classList.contains('hidden')) {
+            form.querySelector('input').focus();
+        }
+    });
+</script>
+{% endblock %}

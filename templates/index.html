@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}NoteSmart - Organize Your Thoughts{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <h1>Organize Your Thoughts with NoteSmart</h1>
+        <p>A versatile note-taking app that helps you store ideas, create to-do lists, and keep everything organized.</p>
+        <div class="cta-buttons">
+            <a href="{{ url_for('register') }}" class="btn btn-primary">Get Started</a>
+            <a href="{{ url_for('login') }}" class="btn btn-secondary">Login</a>
+        </div>
+    </div>
+    <div class="hero-image">
+        <div class="note-card work">
+            <div class="note-header">
+                <span class="note-category">Work</span>
+            </div>
+            <div class="note-body">
+                <h3>Project Ideas</h3>
+                <p>Brainstorming session notes from yesterday's meeting...</p>
+            </div>
+        </div>
+        <div class="note-card personal">
+            <div class="note-header">
+                <span class="note-category">Personal</span>
+            </div>
+            <div class="note-body">
+                <h3>Weekend Plans</h3>
+                <p>Things to prepare for the upcoming trip...</p>
+            </div>
+        </div>
+        <div class="note-card todo high">
+            <div class="note-header">
+                <span class="note-category">To-Do</span>
+                <span class="note-priority">High Priority</span>
+            </div>
+            <div class="note-body">
+                <h3>Finish Presentation</h3>
+                <p>Complete slides for client meeting on Thursday</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="features">
+    <h2>Features</h2>
+    <div class="feature-cards">
+        <div class="feature-card">
+            <div class="feature-icon">📝</div>
+            <h3>Note Taking</h3>
+            <p>Create, edit, and organize your notes with ease.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🔍</div>
+            <h3>Search</h3>
+            <p>Quickly find notes with powerful search capabilities.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📋</div>
+            <h3>To-Do Lists</h3>
+            <p>Track tasks with priorities and mark them as completed.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🏷️</div>
+            <h3>Categories</h3>
+            <p>Organize notes with customizable categories.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

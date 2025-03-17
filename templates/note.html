@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}NoteSmart - {{ note.title }}{% endblock %}
+
+{% block content %}
+<div class="note-view">
+    <div class="note-view-header">
+        <div class="note-info">
+            <h1>{{ note.title }}</h1>
+            <div class="note-metadata">
+                {% if note.category_name %}
+                <span class="note-category">{{ note.category_name }}</span>
+                {% endif %}
+                {% if note.is_todo %}
+                <span class="note-type {{ note.importance }}">{{ note.importance|capitalize }} Priority To-Do</span>
+                <span class="todo-status {{ 'completed' if note.completed else 'pending' }}">{{ 'Completed' if note.completed else 'Pending' }}</span>
+                {% endif %}
+                <span class="note-date">Updated: {{ note.updated_date|datetime }}</span>
+            </div>
+        </div>
+        <div class="note-actions">
+            <a href="{{ url_for('edit_note', note_id=note.id) }}" class="btn btn-primary">Edit</a>
+            <form action="{{ url_for('delete_note', note_id=note.id) }}" method="POST" class="delete-form">
+                <input type="hidden" name="redirect_to" value="dashboard">
+                <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+        </div>
+    </div>
+    
+    {% if note.is_todo %}
+    <div class="todo-toggle">
+        <form action="{{ url_for('api_update_note', note_id=note.id) }}" method="POST" class="checkbox-form">
+            <input type="hidden" name="_method" value="PUT">
+            <input type="hidden" name="completed" value="{{ 'false' if note.completed else 'true' }}">
+            <input type="checkbox" id="complete-todo" {{ 'checked' if note.completed }}>
+            <label for="complete-todo">{{ 'Mark as incomplete' if note.completed else 'Mark as complete' }}</label>
+        </form>
+    </div>
+    {% endif %}
+    
+    <div class="note-content {{ note.color }}">
+        {% if note.content %}
+            <div class="note-text">
+                {{ note.content|nl2br }}
+            </div>
+        {% else %}
+            <div class="note-text empty">
+                <p><em>No content</em></p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="note-view-footer">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Back to Notes</a>
+        {% if note.is_todo %}
+        <a href="{{ url_for('todos') }}" class="btn btn-secondary">View All To-Dos</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Handle checkbox form submission
+    document.querySelector('.checkbox-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        
+        // Extract method and create payload
+        const method = formData.get('_method');
+        const completed = formData.get('completed') === 'true';
+        
+        fetch(this.action, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ completed: completed })
+        })
+        .then(response => {
+            if (response.ok) {
+                // Refresh the page to show updated state
+                window.location.reload();
+            }
+        });
+    });
+    
+    // Submit form when checkbox is clicked
+    document.getElementById('complete-todo').addEventListener('change', function() {
+        document.querySelector('.checkbox-form').dispatchEvent(new Event('submit'));
+    });
+</script>
+{% endblock %}

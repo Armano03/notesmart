@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}NoteSmart - {{ 'Edit Note' if note else 'New Note' }}{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2>{{ 'Edit Note' if note else 'New Note' }}</h2>
+    <form method="POST" class="note-form">
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" id="title" name="title" value="{{ note.title if note else '' }}" required autofocus>
+        </div>
+        
+        <div class="form-group">
+            <label for="content">Content</label>
+            <textarea id="content" name="content" rows="10">{{ note.content if note else '' }}</textarea>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="category">Category</label>
+                <input type="text" id="category" name="category" list="categories" value="{{ note.category_name if note else '' }}">
+                <datalist id="categories">
+                    {% for category in categories %}
+                    <option value="{{ category.name }}">
+                    {% endfor %}
+                </datalist>
+            </div>
+            
+            <div class="form-group form-check">
+                <input type="checkbox" id="is_todo" name="is_todo" value="true" {{ 'checked' if note and note.is_todo else '' }}>
+                <label for="is_todo">This is a to-do</label>
+            </div>
+        </div>
+        
+        <div class="form-row todo-options {{ 'hidden' if not note or not note.is_todo }}">
+            <div class="form-group">
+                <label for="importance">Priority</label>
+                <select id="importance" name="importance">
+                    <option value="low" {{ 'selected' if note and note.importance == 'low' else '' }}>Low</option>
+                    <option value="normal" {{ 'selected' if not note or note.importance == 'normal' else '' }}>Normal</option>
+                    <option value="high" {{ 'selected' if note and note.importance == 'high' else '' }}>High</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="color">Color</label>
+                <select id="color" name="color">
+                    <option value="blue" {{ 'selected' if not note or note.color == 'blue' else '' }}>Blue</option>
+                    <option value="green" {{ 'selected' if note and note.color == 'green' else '' }}>Green</option>
+                    <option value="yellow" {{ 'selected' if note and note.color == 'yellow' else '' }}>Yellow</option>
+                    <option value="red" {{ 'selected' if note and note.color == 'red' else '' }}>Red</option>
+                    <option value="purple" {{ 'selected' if note and note.color == 'purple' else '' }}>Purple</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Toggle to-do options visibility
+    const todoCheckbox = document.getElementById('is_todo');
+    const todoOptions = document.querySelector('.todo-options');
+    
+    todoCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            todoOptions.classList.remove('hidden');
+        } else {
+            todoOptions.classList.add('hidden');
+        }
+    });
+</script>
+{% endblock %}

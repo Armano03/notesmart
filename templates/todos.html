@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}NoteSmart - To-Do List{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>Categories</h2>
+            <button id="add-category-btn" class="btn btn-small">+</button>
+        </div>
+        
+        <div class="category-list">
+            <a href="{{ url_for('dashboard') }}" class="category-item">
+                All Notes
+            </a>
+            {% for category in categories %}
+            <a href="{{ url_for('dashboard', category=category.id) }}" class="category-item">
+                {{ category.name }}
+            </a>
+            {% endfor %}
+        </div>
+        
+        <form id="category-form" action="{{ url_for('new_category') }}" method="POST" class="hidden">
+            <input type="text" name="name" placeholder="New category" required>
+            <button type="submit" class="btn btn-small">Add</button>
+        </form>
+    </div>
+    
+    <div class="main-content">
+        <div class="content-header">
+            <div class="filter-options">
+                <a href="{{ url_for('todos') }}" class="filter-option {% if filter_completed is none %}active{% endif %}">All</a>
+                <a href="{{ url_for('todos', completed='false') }}" class="filter-option {% if filter_completed == 'false' %}active{% endif %}">Pending</a>
+                <a href="{{ url_for('todos', completed='true') }}" class="filter-option {% if filter_completed == 'true' %}active{% endif %}">Completed</a>
+            </div>
+            <a href="{{ url_for('new_note') }}" class="btn btn-primary">New To-Do</a>
+        </div>
+        
+        <div class="todos-list">
+            {% if todos %}
+                {% for todo in todos %}
+                <div class="todo-item {{ todo.importance }} {{ 'completed' if todo.completed }}">
+                    <div class="todo-checkbox">
+                        <div class="checkbox-form" data-note-id="{{ todo.id }}">
+                            <input type="checkbox" {% if todo.completed %}checked{% endif %}>
+                        </div>
+                    </div>
+                    <div class="todo-content">
+                        <h3 class="todo-title">{{ todo.title }}</h3>
+                        <p class="todo-description">{{ todo.content|truncate(100) }}</p>
+                        {% if todo.category_name %}
+                        <span class="todo-category">{{ todo.category_name }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="todo-actions">
+                        <a href="{{ url_for('edit_note', note_id=todo.id) }}" class="btn-icon edit" title="Edit to-do">✏️</a>
+                        <form action="{{ url_for('delete_note', note_id=todo.id) }}" method="POST" class="delete-form">
+                            <input type="hidden" name="redirect_to" value="todos">
+                            <button type="submit" class="btn-icon delete" title="Delete to-do">🗑️</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">✓</div>
+                    <h3>No to-dos found</h3>
+                    <p>Get started by creating your first to-do item!</p>
+                    <a href="{{ url_for('new_note') }}" class="btn btn-primary">Create To-Do</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Toggle category form
+    document.getElementById('add-category-btn').addEventListener('click', function() {
+        const form = document.getElementById('category-form');
+        form.classList.toggle('hidden');
+        if (!form.classList.contains('hidden')) {
+            form.querySelector('input').focus();
+        }
+    });
+</script>
+<script src="{{ url_for('static', filename='js/todos.js') }}"></script>
+{% endblock %}
